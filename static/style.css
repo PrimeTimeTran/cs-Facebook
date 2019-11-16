@@ -1,0 +1,21 @@
+* {
+  margin: 0;
+}
+
+body {
+  background-color: #e9ebee;
+}
+
+.card {
+  padding: 15px;
+}
+
+.avatar {
+  height: 100px;
+  width: 100px;
+}
+
+nav {
+  color: white;
+  background-color: #4267b2;
+}

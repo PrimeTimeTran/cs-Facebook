@@ -1,9 +1,17 @@
 {% extends 'base.html' %}
 
+{% block head %}
+    {% if current_user.is_authenticated: %}
+        <title>Facebook - Newsfeed, News, Images, Video</title>
+    {% else %}
+        <title>Facebook - Please Sign In</title>
+    {% endif %}
+{% endblock head %}
+
 {% block body %}
     {% if current_user.is_authenticated: %}
         {% include 'views/home.html' %}
     {% else %}
-        {% include 'registeration-form.html' %}
+        {% include 'components/register-form.html' %}
     {% endif %}
 {% endblock body %}

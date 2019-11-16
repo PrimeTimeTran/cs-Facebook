@@ -4,6 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager, logout_user, login_user, current_user, login_required
 
 from werkzeug.security import generate_password_hash, check_password_hash
+import enum
+from flask_moment import Moment
 
 app = Flask(__name__)
 
@@ -11,6 +13,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.sqlite3'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = 'Secret'
 
+moment = Moment()
+moment.init_app(app)
 login_manager = LoginManager(app)
 db = SQLAlchemy(app)
 
@@ -40,6 +44,23 @@ class Comment(db.Model):
     image_url = db.Column(db.Text)
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
 
+class ReactionEnum(enum.Enum):
+    liked = 'liked'
+    laughed = 'laughed'
+    wowed = 'wowed'
+    frowned = 'frowned'
+    loved = 'loved'
+
+class Reaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    post_id = db.Column(db.Integer)
+    reaction_type = db.Column(
+        db.Enum(ReactionEnum), 
+        default=ReactionEnum.liked,
+        nullable=False
+    )
+
 db.create_all()
 
 @login_manager.user_loader
@@ -56,14 +77,17 @@ def home():
         user = User.query.get(post.user_id)
         post.avatar_url = user.avatar_url
         post.username = user.email
-
     return render_template('/views/root.html', posts = posts)
 
 @app.route('/users', methods=['POST'])
 def create_user():
     user = User.query.filter_by(email = request.form['email']).first()
     if user:
+        print('found')
         if user.check_password(request.form['password']):
+            return redirect(url_for('home'))
+        else: 
+            flash('Incorrect password', 'info')
             return redirect(url_for('home'))
     else:
         if request.method == 'POST':
@@ -93,13 +117,15 @@ def create_post():
 @app.route('/posts/<id>')
 def view_post(id):
     post = Post.query.get(id)
+    user = User.query.get(post.user_id)
+    post.avatar_url = user.avatar_url
+    post.username = user.email
     comments = Comment.query.filter_by(post_id = post.id).all()
     for comment in comments:
         user = User.query.get(comment.user_id)
         comment.username = user.email
         comment.avatar_url = user.avatar_url
-    return render_template('post.html', post = post, comments = comments)
-
+    return render_template('/views/post.html', post = post, comments = comments)
 
 @app.route('/posts/<id>/comments', methods=["POST"])
 def create_comment(id):

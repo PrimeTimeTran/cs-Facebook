@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import os
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
 from flask_login import UserMixin, LoginManager, logout_user, login_user, current_user, login_required
@@ -18,8 +19,9 @@ moment = Moment()
 moment.init_app(app)
 login_manager = LoginManager(app)
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
-class User(UserMixin, db.Model):
+class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(255))
@@ -66,7 +68,7 @@ db.create_all()
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(user_id)
+    return Users.query.get(user_id)
 
 @app.route('/')
 def home():
@@ -75,14 +77,14 @@ def home():
     else: 
         posts = Post.query.all()
     for post in posts:
-        user = User.query.get(post.user_id)
+        user = Users.query.get(post.user_id)
         post.avatar_url = user.avatar_url
         post.username = user.email
     return render_template('/views/root.html', posts = posts)
 
 @app.route('/users', methods=['POST'])
 def create_user():
-    user = User.query.filter_by(email = request.form['email']).first()
+    user = Users.query.filter_by(email = request.form['email']).first()
     if user:
         print('found')
         if user.check_password(request.form['password']):
@@ -92,7 +94,7 @@ def create_user():
             return redirect(url_for('home'))
     else:
         if request.method == 'POST':
-            user = User(email = request.form['email'], avatar_url = request.form['avatar_url'])
+            user = Users(email = request.form['email'], avatar_url = request.form['avatar_url'])
             user.set_password(request.form['password'])
             flash('Successfully signed up!', 'success')
             db.session.add(user)
@@ -118,12 +120,12 @@ def create_post():
 @app.route('/posts/<id>')
 def view_post(id):
     post = Post.query.get(id)
-    user = User.query.get(post.user_id)
+    user = Users.query.get(post.user_id)
     post.avatar_url = user.avatar_url
     post.username = user.email
     comments = Comment.query.filter_by(post_id = post.id).all()
     for comment in comments:
-        user = User.query.get(comment.user_id)
+        user = Users.query.get(comment.user_id)
         comment.username = user.email
         comment.avatar_url = user.avatar_url
     return render_template('/views/post.html', post = post, comments = comments)

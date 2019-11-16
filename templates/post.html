@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block body %}
+{% include 'views/components/_post.html' %}
+{% if current_user.id == post.user_id: %}
+<div class="row d-flex justify-content-center align-items-center">
+    <div class="col col-6">
+        <div class="container">
+            <form class="form-signin" method="POST" action="/posts/{{post.id}}">
+                <input name="body" type="body" class="form-control" value="{{post.body}}">
+                <input name="image_url" type="body" class="form-control" value="{{post.image_url}}">
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Edit Post</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+<div class="container">
+    <h1>Comments</h1>
+    {% for comment in comments %}
+    <div class="card">
+        <img src="{{comment.image_url}}" class="card-img-top" alt="...">
+        <h1>Commenter Avatar</h1>
+        <img src="{{comment.avatar_url}}" class="card-img-top" alt="...">
+        <h1>Commenter Email</h1>
+        <p>{{comment.username}}</p>
+        <div class="card-body">
+            <h5 class="card-title">{{ comment.body }}</h5>
+            <a href="#" class="btn btn-primary">????????</a>
+        </div>
+    </div>
+    {% endfor %}
+
+    <form class="form-signin" method="POST" action="/posts/{{post.id}}/comments">
+        <input name="body" type="body" class="form-control" placeholder="What's on your mind {{current_user.email}}?"
+            required="" autofocus="">
+        <input name="image_url" class="form-control" required="" autofocus="">
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Post</button>
+    </form>
+</div>
+{% endblock body %}

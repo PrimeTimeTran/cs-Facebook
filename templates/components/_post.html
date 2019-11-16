@@ -1,0 +1,13 @@
+<div class="row d-flex justify-content-center align-items-center mt-5">
+    <div class="col col-10">
+        <div class="card">
+            <img src="{{post.image_url}}" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title"><a href="{{url_for('view_post', id = post.id)}}">{{post.body}}</a></h5>
+                <p class="card-text">{{post.created_at}}</p>
+                <h1>{{post.username}}</h1>
+                <img src="{{post.avatar_url}}" alt="" style="height: 100px; width: 100px">
+            </div>
+        </div>
+    </div>
+</div>

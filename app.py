@@ -10,7 +10,7 @@ from flask_moment import Moment
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']      
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = 'Secret'
 
@@ -45,22 +45,22 @@ class Comment(db.Model):
     image_url = db.Column(db.Text)
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
 
-class ReactionEnum(enum.Enum):
-    liked = 'liked'
-    laughed = 'laughed'
-    wowed = 'wowed'
-    frowned = 'frowned'
-    loved = 'loved'
+# class ReactionEnum(enum.Enum):
+#     liked = 'liked'
+#     laughed = 'laughed'
+#     wowed = 'wowed'
+#     frowned = 'frowned'
+#     loved = 'loved'
 
-class Reaction(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
-    post_id = db.Column(db.Integer)
-    reaction_type = db.Column(
-        db.Enum(ReactionEnum), 
-        default=ReactionEnum.liked,
-        nullable=False
-    )
+# class Reaction(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     user_id = db.Column(db.Integer)
+#     post_id = db.Column(db.Integer)
+#     reaction_type = db.Column(
+#         db.Enum(ReactionEnum), 
+#         default=ReactionEnum.liked,
+#         nullable=False
+#     )
 
 db.create_all()
 

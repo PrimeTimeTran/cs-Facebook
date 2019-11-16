@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
+import os
 from flask_sqlalchemy import SQLAlchemy
 
 from flask_login import UserMixin, LoginManager, logout_user, login_user, current_user, login_required
@@ -9,7 +10,7 @@ from flask_moment import Moment
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.sqlite3'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = 'Secret'
 

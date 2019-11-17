@@ -1,8 +1,8 @@
-```python
-1 + 1
-```
+# Setup
 
-```jinja
-{% if current_user.is_authenticated: %}
-{% end %}
-```
+A Facebook clone written with Flask.
+
+1. `git clone git@github.com:PrimeTimeTran/cs-Facebook.git`
+2. `cd cs-Facebook`
+3. `pip install -r requirements.txt`
+4. `python app.py`

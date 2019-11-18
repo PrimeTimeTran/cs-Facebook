@@ -11,9 +11,27 @@ from flask_moment import Moment
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']      
+POSTGRES = {
+    'user': 'primetimetran',
+    'pw': 'millions',
+    'db': 'primetimetran',
+    'host': 'localhost',    
+    'port': 5432,
+}
+
+# SQLite3 Setup
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.sqlite3'
+
+
+# Production Postgres Setp
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-app.secret_key = 'Secret'
+
+# Local Postgres Setup
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:\
+%(port)s/%(db)s' % POSTGRES
+
+app.secret_key = 'My super secret secret'
 
 moment = Moment()
 moment.init_app(app)
@@ -38,6 +56,8 @@ class Post(db.Model):
     body = db.Column(db.Text)
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
     image_url = db.Column(db.Text)
+    friend_id = db.Column(db.Integer)
+    view_count = db.Column(db.Integer, default=0)
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -47,22 +67,32 @@ class Comment(db.Model):
     image_url = db.Column(db.Text)
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
 
-# class ReactionEnum(enum.Enum):
-#     liked = 'liked'
-#     laughed = 'laughed'
-#     wowed = 'wowed'
-#     frowned = 'frowned'
-#     loved = 'loved'
+class Tags(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    post_id = db.Column(db.Integer)
 
-# class Reaction(db.Model):
+# class Friendship(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)
 #     user_id = db.Column(db.Integer)
-#     post_id = db.Column(db.Integer)
-#     reaction_type = db.Column(
-#         db.Enum(ReactionEnum), 
-#         default=ReactionEnum.liked,
-#         nullable=False
-#     )
+#     friend_id = db.Column(db.Integer)
+
+    # class ReactionEnum(enum.Enum):
+    #     liked = 'liked'
+    #     laughed = 'laughed'
+    #     wowed = 'wowed'
+    #     frowned = 'frowned'
+    #     loved = 'loved'
+
+    # class Reaction(db.Model):
+    #     id = db.Column(db.Integer, primary_key=True)
+    #     user_id = db.Column(db.Integer)
+    #     post_id = db.Column(db.Integer)
+    #     reaction_type = db.Column(
+    #         db.Enum(ReactionEnum), 
+    #         default=ReactionEnum.liked,
+    #         nullable=False
+    #     )
 
 db.create_all()
 
@@ -86,8 +116,9 @@ def home():
 def create_user():
     user = Users.query.filter_by(email = request.form['email']).first()
     if user:
-        print('found')
         if user.check_password(request.form['password']):
+            login_user(user)
+            flash('Welcome back {0}~!'.format(current_user.email), 'info')
             return redirect(url_for('home'))
         else: 
             flash('Incorrect password', 'info')
@@ -147,5 +178,4 @@ def edit_post(id):
     return redirect(url_for('view_post', id=id))
 
 if __name__ == "__main__":
-    # app.run(debug = True)
-    app.run()
+    app.run(debug = True)

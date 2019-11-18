@@ -16,13 +16,11 @@
 # # 2
 # # print(solve([5, 2, 3, 4, 1, 5]))
 
+# def sockMerchant(n, ar):
+#     count = 0
+#     n -= 1
+#     first = ar[0]
+#     print(n)
 
-
-def sockMerchant(n, ar):
-    count = 0
-    n -= 1
-    first = ar[0]
-    print(n)
-
-# is 3
-print(sockMerchant(9, [10, 20, 20, 10, 10, 30, 50, 10, 20]))
+# # is 3
+# print(sockMerchant(9, [10, 20, 20, 10, 10, 30, 50, 10, 20]))

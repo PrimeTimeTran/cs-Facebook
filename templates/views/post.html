@@ -1,9 +1,8 @@
 {% extends 'base.html' %}
 
 {% block body %}
-<div class="row">
+<div class="row mt-5 pt-5">
     <div class="col col-4">
-        
     </div>
     <div class="col col-4 overflow-auto overflow-hidden">
         {% include '/components/_post.html' %}
@@ -13,39 +12,48 @@
 </div>
 
 {% if current_user.id == post.user_id: %}
-<div class="row d-flex justify-content-center align-items-center">
+<div class="row d-flex justify-content-center align-items-center mb-5">
     <div class="col col-6">
-        <div class="container">
-            <form class="form-signin" method="POST" action="/posts/{{post.id}}">
-                <input name="body" type="body" class="form-control" value="{{post.body}}">
-                <input name="image_url" type="body" class="form-control" value="{{post.image_url}}">
-                <button class="btn btn-lg btn-primary btn-block" type="submit">Edit Post</button>
-            </form>
-        </div>
+        <form class="form-signin" method="POST" action="/posts/{{post.id}}">
+            <input name="body" type="body" class="form-control" value="{{post.body}}">
+            <input name="image_url" type="body" class="form-control" value="{{post.image_url}}">
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Edit Post</button>
+        </form>
     </div>
 </div>
 {% endif %}
 <div class="container">
-    <h1>Comments</h1>
-    {% for comment in comments %}
-    <div class="card">
-        <h1>Comment Image</h1>
-        <img src="{{comment.image_url}}" class="card-img-top" alt="...">
-        <h1>Commenter Avatar</h1>
-        <img src="{{comment.avatar_url}}" class="card-img-top" alt="...">
-        <h1>Commenter Email</h1>
-        <p>{{comment.username}}</p>
-        <div class="card-body">
-            <h5 class="card-title">{{ comment.body }} </h5>
+    <div class="row d-flex justify-content-center align-items-center">
+        {% for comment in comments %}
+        <div class="col col-6">
+            <div class="card">
+                <div class="row">
+                    <div class="col col-3">
+                        <img src="{{comment.avatar_url}}" class="card-img-top avatar">  
+                    </div>
+                    <div class="col col-9">
+                        <p>{{comment.username}}</p>
+                        <p>{{moment(comment.created_at).format('MMMM Do YYYY, h:mm:ss a')}}</p></p>
+                    </div>
+                </div>
+                <p class="card-title">{{ comment.body }} </p>
+                <img src="{{comment.image_url}}" class="card-img-top">
+                <div class="card-body">
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
-    {% endfor %}
+    <div class="row d-flex justify-content-center align-items-center">
+        <div class="col col-6">
+            <form class="form-signin" method="POST" action="/posts/{{post.id}}/comments">
+                <input name="body" type="body" class="form-control"
+                    placeholder="What's on your mind {{current_user.email}}?" required="" autofocus="">
+                <input name="image_url" class="form-control" required="" autofocus="">
+                <button class="btn btn-lg btn-success btn-block" type="submit">Comment</button>
+            </form>
+        </div>
 
-    <form class="form-signin" method="POST" action="/posts/{{post.id}}/comments">
-        <input name="body" type="body" class="form-control" placeholder="What's on your mind {{current_user.email}}?"
-            required="" autofocus="">
-        <input name="image_url" class="form-control" required="" autofocus="">
-        <button class="btn btn-lg btn-success btn-block" type="submit">Comment</button>
-    </form>
+    </div>
 </div>
 {% endblock body %}

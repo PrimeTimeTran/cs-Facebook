@@ -11,11 +11,10 @@ from flask_moment import Moment
 
 app = Flask(__name__)
 
-<<<<<<< HEAD
 POSTGRES = {
     'user': 'primetimetran',
     'pw': 'millions',
-    'db': 'primetimetran',
+    'db': 'flask-fb',
     'host': 'localhost',    
     'port': 5432,
 }
@@ -49,6 +48,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(255))
     avatar_url = db.Column(db.Text)
+    liked_posts = db.relationship('Post', secondary='likes', backref='likers', lazy=True)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -71,11 +71,10 @@ class Comment(db.Model):
     image_url = db.Column(db.Text)
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
 
-class Tags(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
-    post_id = db.Column(db.Integer)
-
+likes = db.Table('likes',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('post_id', db.Integer, db.ForeignKey('post.id'), primary_key=True)
+)
 
 db.create_all()
 
@@ -161,6 +160,16 @@ def edit_post(id):
     post.image_url = request.form['image_url']
     db.session.commit()
     return redirect(url_for('view_post', id=id))
+
+
+@app.route('/likes', methods=['POST'])
+@login_required
+def create_like():
+    like = Like(type=1)
+    current_user.likes.append(like)
+    post.likes
+
+
 
 if __name__ == "__main__":
     app.run(debug = True)

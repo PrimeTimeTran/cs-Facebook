@@ -11,7 +11,7 @@ from flask_moment import Moment
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']      
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.sqlite3"    
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = 'Secret'
 
@@ -19,9 +19,11 @@ moment = Moment()
 moment.init_app(app)
 login_manager = LoginManager(app)
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
 
-class Users(UserMixin, db.Model):
+#set up flask migration
+migrate = Migrate(app,db)
+
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(255))
@@ -38,6 +40,7 @@ class Post(db.Model):
     body = db.Column(db.Text)
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
     image_url = db.Column(db.Text)
+    view_count = db.Column(db.Integer, default=0)
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -68,7 +71,7 @@ db.create_all()
 
 @login_manager.user_loader
 def load_user(user_id):
-    return Users.query.get(user_id)
+    return User.query.get(user_id)
 
 @app.route('/')
 def home():
@@ -77,14 +80,14 @@ def home():
     else: 
         posts = Post.query.all()
     for post in posts:
-        user = Users.query.get(post.user_id)
+        user = User.query.get(post.user_id)
         post.avatar_url = user.avatar_url
         post.username = user.email
     return render_template('/views/root.html', posts = posts)
 
 @app.route('/users', methods=['POST'])
 def create_user():
-    user = Users.query.filter_by(email = request.form['email']).first()
+    user = User.query.filter_by(email = request.form['email']).first()
     if user:
         print('found')
         if user.check_password(request.form['password']):
@@ -94,7 +97,7 @@ def create_user():
             return redirect(url_for('home'))
     else:
         if request.method == 'POST':
-            user = Users(email = request.form['email'], avatar_url = request.form['avatar_url'])
+            user = User(email = request.form['email'], avatar_url = request.form['avatar_url'])
             user.set_password(request.form['password'])
             flash('Successfully signed up!', 'success')
             db.session.add(user)
@@ -120,12 +123,14 @@ def create_post():
 @app.route('/posts/<id>')
 def view_post(id):
     post = Post.query.get(id)
-    user = Users.query.get(post.user_id)
+    post.view_count +=1
+    db.session.commit()
+    user = User.query.get(post.user_id)
     post.avatar_url = user.avatar_url
     post.username = user.email
     comments = Comment.query.filter_by(post_id = post.id).all()
     for comment in comments:
-        user = Users.query.get(comment.user_id)
+        user = User.query.get(comment.user_id)
         comment.username = user.email
         comment.avatar_url = user.avatar_url
     return render_template('/views/post.html', post = post, comments = comments)
@@ -147,5 +152,5 @@ def edit_post(id):
     return redirect(url_for('view_post', id=id))
 
 if __name__ == "__main__":
-    # app.run(debug = True)
-    app.run()
+    app.run(debug = True)
+    # app.run()

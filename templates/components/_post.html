@@ -17,6 +17,7 @@
             <img src="{{post.image_url}}" class="card-img-top" style="max-height: 500px">
             <div class="card-body">
                 <h5 class="card-title"><a href="{{url_for('view_post', id = post.id)}}">{{post.body}}</a></h5>
+                <h5 class='card-title'>views: {{post.view_count}}</h5>
             </div>
         </div>
     </div>

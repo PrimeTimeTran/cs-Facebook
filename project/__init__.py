@@ -9,23 +9,13 @@ import enum
 from flask_moment import Moment
 
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+# app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://primetimetran:millions@localhost:5432/flask-fb"
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
 db = SQLAlchemy(app)
 
-POSTGRES = {
-    'port': 5432,
-    'pw': 'millions',
-    'db': 'flask-fb',
-    'host': 'localhost',    
-    'user': 'primetimetran',
-}
-
-
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:\
-# %(port)s/%(db)s' % POSTGRES
-
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = 'My super secret secret'
 moment = Moment()
 moment.init_app(app)

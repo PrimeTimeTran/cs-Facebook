@@ -1,5 +1,7 @@
-from flask import render_template, flash, request, url_for, Blueprint
+from flask import render_template, flash, request, url_for, Blueprint, redirect
 from flask_login import logout_user, login_user, current_user
+
+from project.models import User
 
 users_blueprint = Blueprint(
     'users',
@@ -9,7 +11,7 @@ users_blueprint = Blueprint(
 
 @users_blueprint.route('/', methods=['POST'])
 def create():
-    print('Creating a user')
+    print('Creating a user KHOA')
     user = User.query.filter_by(email = request.form['email']).first()
     if user:
         if user.check_password(request.form['password']):

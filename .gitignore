@@ -1,1 +1,5 @@
-go
+# Environments
+.env
+venv/
+__pycache__
+env

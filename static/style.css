@@ -6,17 +6,17 @@ body {
   background-color: #e9ebee;
 }
 
+nav {
+  color: white;
+  background-color: #4267b2;
+}
+
 .card {
   padding: 15px;
 }
 
 .avatar {
-  height: 75px;
   width: 75px;
+  height: 75px;
   border-radius: 38px;
-}
-
-nav {
-  color: white;
-  background-color: #4267b2;
 }

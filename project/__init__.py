@@ -11,7 +11,6 @@ from flask_moment import Moment
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
-# app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://primetimetran:millions@localhost:5432/flask-fb"
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 db = SQLAlchemy(app)
@@ -44,6 +43,7 @@ def home():
         user = User.query.get(post.user_id)
         post.avatar_url = user.avatar_url
         post.username = user.email
+    print('Hi')
     return render_template('/views/root.html', posts = posts)
 
 @app.route('/posts', methods=['POST'])

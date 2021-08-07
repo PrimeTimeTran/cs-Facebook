@@ -2,10 +2,12 @@
 
 A Facebook clone written with Flask.
 
-1. `git clone git@github.com:PrimeTimeTran/cs-Facebook.git`
-2. `cd cs-Facebook`
-3. `pip install -r requirements.txt`
-4. `python app.py`
+- `git clone git@github.com:PrimeTimeTran/cs-Facebook.git`
+- `cd cs-Facebook`
+- `source ./venv/bin/activate`
+- `pip install -r requirements.txt`
+- `psql -U postgres -c 'create database flaskfb'`
+- `python app.py` or `flask run`
 
 ## Todo
 
